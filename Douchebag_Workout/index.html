@@ -20,6 +20,71 @@
 <body>
     <div id="content"></div>
 
+    <!-- Unlock GameDistribution domain lock: chặn blocked.min.js, block API, xóa overlay nếu có -->
+    <script>
+    (function(){
+        function blockScript(src) {
+            return typeof src === 'string' && /blocked|gdsdk-blocked|gamedistribution\.com\/block/i.test(src);
+        }
+        var origAppend = Node.prototype.appendChild;
+        Node.prototype.appendChild = function(el) {
+            if (el && el.tagName === 'SCRIPT' && el.src && blockScript(el.src)) return el;
+            if (el && el.id === 'gamedistribution-jssdkblocked') return el;
+            return origAppend.apply(this, arguments);
+        };
+        var origInsertBefore = Node.prototype.insertBefore;
+        Node.prototype.insertBefore = function(el, ref) {
+            if (el && el.tagName === 'SCRIPT' && el.src && blockScript(el.src)) return el;
+            if (el && el.id === 'gamedistribution-jssdkblocked') return el;
+            return origInsertBefore.apply(this, arguments);
+        };
+        var _f = window.fetch;
+        if (_f) window.fetch = function(u, o) {
+            var url = typeof u === 'string' ? u : (u && u.url) || '';
+            if (/gamedistribution\.com.*block|html5\.api\.gamedistribution/i.test(url))
+                return Promise.resolve(new Response('{"allowed":true}', { status: 200 }));
+            return _f.apply(this, arguments);
+        };
+        var X = XMLHttpRequest;
+        if (X) {
+            window.XMLHttpRequest = function() {
+                var x = new X();
+                var open = x.open;
+                x.open = function(m, url) {
+                    if (/gamedistribution\.com.*block|html5\.api\.gamedistribution/i.test(url || '')) {
+                        x._blockUrl = url;
+                        return;
+                    }
+                    return open.apply(this, arguments);
+                };
+                var send = x.send;
+                x.send = function() {
+                    if (x._blockUrl) {
+                        setTimeout(function() {
+                            x.readyState = 4;
+                            x.status = 200;
+                            x.responseText = '{"allowed":true}';
+                            try { x.onreadystatechange && x.onreadystatechange(); } catch(e){}
+                            try { x.onload && x.onload({target:x}); } catch(e){}
+                            try { x.dispatchEvent && x.dispatchEvent(new Event('load')); } catch(e){}
+                        }, 0);
+                        return;
+                    }
+                    return send.apply(this, arguments);
+                };
+                return x;
+            };
+        }
+        function removeBlock() {
+            var b = document.getElementById('gdsdk-blocked__') || document.querySelector('.gdsdk-blocked__');
+            if (b) { b.remove(); }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', removeBlock);
+        } else { removeBlock(); }
+        new MutationObserver(removeBlock).observe(document.body || document.documentElement, { childList: true, subtree: true });
+    })();
+    </script>
     <!-- Fix AudioContext: trình duyệt yêu cầu user gesture trước khi phát âm thanh -->
     <script>
     (function(){
