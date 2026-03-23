@@ -275,9 +275,83 @@
 
     </script>
 
-	<!-- SDK IMA Ad Tag Start (After Game End) -->
-	<!-- https://pubads.g.doubleclick.net/gampad/ads?iu=/23136362493/ads-video-main&description_url=http%3A%2F%2Fcool2fun.guthub.io&tfcd=0&npa=0&sz=640x480&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator= -->
-	<!-- SDK IMA Ad Tag End -->
+</script>
+
+<!-- Google IMA SDK tích hợp mẫu -->
+<script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+<script>
+// Tích hợp Google IMA SDK vào game Knife Hit
+// Tạo player video ẩn để hiển thị quảng cáo
+var imaVideoPlayer = document.createElement('video');
+imaVideoPlayer.id = 'ima-video-player';
+imaVideoPlayer.style.display = 'none';
+imaVideoPlayer.setAttribute('playsinline', '');
+imaVideoPlayer.setAttribute('webkit-playsinline', '');
+document.body.appendChild(imaVideoPlayer);
+
+var adDisplayContainer, adsLoader, adsManager;
+
+function initIMA() {
+	adDisplayContainer = new google.ima.AdDisplayContainer(
+		document.createElement('div'), // container sẽ được tạo động
+		imaVideoPlayer
+	);
+	adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+	adsLoader.addEventListener(
+		google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+		onAdsManagerLoaded,
+		false
+	);
+	adsLoader.addEventListener(
+		google.ima.AdErrorEvent.Type.AD_ERROR,
+		onAdError,
+		false
+	);
+}
+
+function requestAds() {
+	var adsRequest = new google.ima.AdsRequest();
+	adsRequest.adTagUrl = window.vastAdTagUrl;
+	adsRequest.linearAdSlotWidth = 640;
+	adsRequest.linearAdSlotHeight = 480;
+	adsRequest.nonLinearAdSlotWidth = 640;
+	adsRequest.nonLinearAdSlotHeight = 150;
+	adsLoader.requestAds(adsRequest);
+}
+
+function onAdsManagerLoaded(adsManagerLoadedEvent) {
+	adsManager = adsManagerLoadedEvent.getAdsManager(imaVideoPlayer);
+	try {
+		adsManager.init(640, 480, google.ima.ViewMode.NORMAL);
+		adsManager.start();
+	} catch (adError) {
+		console.log('AdsManager could not be started');
+	}
+}
+
+function onAdError(adErrorEvent) {
+	console.log('Ad error:', adErrorEvent.getError());
+	if (adsManager) {
+		adsManager.destroy();
+	}
+}
+
+// Tự động load quảng cáo khi game bắt đầu
+window.addEventListener('DOMContentLoaded', function() {
+	if (window.google && window.google.ima) {
+		initIMA();
+		requestAds();
+	} else {
+		// Nếu SDK chưa load kịp, thử lại sau 1s
+		setTimeout(function() {
+			if (window.google && window.google.ima) {
+				initIMA();
+				requestAds();
+			}
+		}, 1000);
+	}
+});
+</script>
 </body> 
 
 </html> 
