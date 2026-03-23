@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!-- <meta id="viewport" name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui, shrink-to-fit=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes"> -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, minimal-ui, width=device-width, height=device-height">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+
+    <title>Douchebag Workout</title>
+
+    <link rel="stylesheet" href="assets/css/app.css" type="text/css" />
+
+</head>
+
+<body>
+    <div id="content"></div>
+
+    <!-- Fix AudioContext: trình duyệt yêu cầu user gesture trước khi phát âm thanh -->
+    <script>
+    (function(){
+        var contexts = [];
+        var C = window.AudioContext || window.webkitAudioContext;
+        if (C) {
+            var Orig = C;
+            window.AudioContext = window.webkitAudioContext = function() {
+                var ctx = new Orig();
+                contexts.push(ctx);
+                return ctx;
+            };
+        }
+        function resumeAll() {
+            contexts.forEach(function(ctx){
+                if (ctx && ctx.state === 'suspended' && ctx.resume) ctx.resume().catch(function(){});
+            });
+        }
+        ['click','touchstart','keydown'].forEach(function(ev){
+            document.addEventListener(ev, resumeAll, { once: true, capture: true });
+        });
+        window._resumeAudio = resumeAll;
+    })();
+    </script>
+    <!-- IMA SDK: tag từ ads/tag manager.txt (chạy apply_ads_tag.py để cập nhật) -->
+    <script>
+    (function(){
+        var VAST_TAG = "https://pubads.g.doubleclick.net/gampad/ads?iu=/23136362493/ads-video-main&description_url=http%3A%2F%2Fcool2fun.guthub.io&tfcd=0&npa=0&sz=640x480&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=";
+        window.adTagUrl = window.AD_TAG_URL = window.imaAdTag = window.vastTag = window.adsTag = VAST_TAG;
+        Object.defineProperty(window, "adTag", { get: function(){ return VAST_TAG; }, configurable: true });
+        var _fetch = window.fetch;
+        if (_fetch) {
+            window.fetch = function(url, opts) {
+                var u = typeof url === "string" ? url : (url && url.url);
+                if (u && /vast|gampad|doubleclick|pubads|ima/i.test(u)) return _fetch(VAST_TAG, opts);
+                return _fetch.apply(this, arguments);
+            };
+        }
+        var _XHO = window.XMLHttpRequest;
+        if (_XHO) {
+            window.XMLHttpRequest = function() {
+                var xhr = new _XHO();
+                var orig = xhr.open;
+                xhr.open = function(m, url) {
+                    var args = Array.prototype.slice.call(arguments);
+                    if (typeof url === "string" && /vast|gampad|doubleclick|pubads|ima/i.test(url))
+                        args[1] = VAST_TAG;
+                    return orig.apply(this, args);
+                };
+                return xhr;
+            };
+        }
+        function patchIMA() {
+            try {
+                if (window.google && window.google.ima && window.google.ima.AdsLoader && !window.google.ima.AdsLoader._tagPatched) {
+                    window.google.ima.AdsLoader._tagPatched = true;
+                    var orig = window.google.ima.AdsLoader.prototype.requestAds;
+                    if (orig) {
+                        window.google.ima.AdsLoader.prototype.requestAds = function(request) {
+                            if (request && request.adTagUrl) request.adTagUrl = VAST_TAG;
+                            return orig.apply(this, arguments);
+                        };
+                    }
+                }
+            } catch(e) {}
+        }
+        document.addEventListener("DOMContentLoaded", patchIMA);
+        setTimeout(patchIMA, 1000);
+        setInterval(patchIMA, 800);
+    })();
+    </script>
+    <script>
+        var gameName = "douchebag-workout.min.js",
+            gtag;
+
+
+
+        var fbrqLA = true,
+            fbrqBD = 8,
+            playBtn = true,
+            fbrqSA = false,
+            libs = [],
+            version = 'GameDistribution-31';
+
+
+        //This all here is for cache busting;
+        function addScript(src, buster, callback) {
+            var s = document.createElement('script');
+            s.setAttribute('src', src + '?v=' + buster);
+            if (typeof callback === 'function') {
+                s.onload = callback;
+            }
+            document.body.appendChild(s);
+        }
+
+
+
+        addScript(gameName, version, function() {});
+    </script>
+</body>
+
+</html>

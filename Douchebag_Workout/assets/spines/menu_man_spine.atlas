@@ -1,0 +1,11 @@
+menu_man_spine.png
+size: 1, 1
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+
+douche_abs
+  rotate: false
+  bounds: 0, 0, 1, 1
+  offset: 0, 0
+  index: -1
