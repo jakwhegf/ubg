@@ -1,39 +1,112 @@
 /**
- * IMA SDK Ads Wrapper for CS Dust (Unity WebGL)
- * Ad Unit: /23136362493/Adubg
+ * IMA wrapper — CS Dust (Unity WebGL)
+ * Cấu hình đồng bộ tag với Apps Script test (appscript-ads-video + cool2fun description_url).
  */
 
 (function () {
   "use strict";
 
-  // ============== CONFIG ==============
-  var AD_TAG_BASE = "https://pubads.g.doubleclick.net/gampad/ads"
-    + "?iu=/23136362493/Adubg"
-    + "&description_url=" + encodeURIComponent(window.location.href)
-    + "&tfcd=0&npa=0"
-    + "&sz=640x480"
-    + "&ciu_szs=300x600%2C160x600"
-    + "&gdfp_req=1"
-    + "&unviewed_position_start=1"
-    + "&output=vast"
-    + "&env=vp"
-    + "&impl=s"
-    + "&correlator=";
+  // ============== CONFIG (sửa tại đây) ==============
+  var CONFIG = {
+    /** Đường dẫn ad unit GAM — khớp test-ima-vast.gs / code.gs */
+    adUnitPath: "/23136362493/appscript-ads-video",
+    /**
+     * description_url chuỗi tuyệt đối (Google khuyến nghị HTTPS).
+     * Đặt true để dùng trang hiện tại: encodeURIComponent(location.href)
+     */
+    usePageAsDescriptionUrl: false,
+    descriptionUrl: "https://cool2fun.github.io/",
+    sz: "640x480",
+    ciu_szs: "160x600%2C300x600",
+    tfcd: "0",
+    npa: "0",
+    /** Khớp Linear slot trong IMA AdsRequest với tham số sz trên tag */
+    linearAdSlotWidth: 640,
+    linearAdSlotHeight: 480,
+    nonLinearAdSlotWidth: 300,
+    nonLinearAdSlotHeight: 600,
+    vastLoadTimeout: 60000,
+    loadVideoTimeout: 60000,
+    /** insecure | enabled | disabled — trang thường (GitHub Pages) thường dùng insecure */
+    vpaidMode: "insecure",
+    numRedirects: 10
+  };
 
-  function getAdTagUrl() {
-    return AD_TAG_BASE + Date.now();
+  function getAdTagBase() {
+    var descParam = encodeURIComponent(
+      CONFIG.usePageAsDescriptionUrl
+        ? String(window.location.href || "").split("#")[0]
+        : CONFIG.descriptionUrl
+    );
+    return (
+      "https://pubads.g.doubleclick.net/gampad/ads" +
+      "?iu=" +
+      encodeURIComponent(CONFIG.adUnitPath) +
+      "&description_url=" +
+      descParam +
+      "&tfcd=" +
+      CONFIG.tfcd +
+      "&npa=" +
+      CONFIG.npa +
+      "&sz=" +
+      CONFIG.sz +
+      "&ciu_szs=" +
+      CONFIG.ciu_szs +
+      "&gdfp_req=1" +
+      "&unviewed_position_start=1" +
+      "&output=vast" +
+      "&env=vp" +
+      "&impl=s" +
+      "&correlator="
+    );
   }
 
-  // ============== IMA VARIABLES ==============
+  function getAdTagUrl() {
+    return getAdTagBase() + Date.now();
+  }
+
+  function applyVpaidMode() {
+    try {
+      var VP = google.ima.ImaSdkSettings && google.ima.ImaSdkSettings.VpaidMode;
+      if (!VP || !google.ima.settings.setVpaidMode) return;
+      var vm = String(CONFIG.vpaidMode || "insecure").toLowerCase();
+      if (vm === "disabled" && VP.DISABLED != null) {
+        google.ima.settings.setVpaidMode(VP.DISABLED);
+      } else if (vm === "insecure" && VP.INSECURE != null) {
+        google.ima.settings.setVpaidMode(VP.INSECURE);
+      } else {
+        google.ima.settings.setVpaidMode(VP.ENABLED);
+      }
+    } catch (e) {}
+  }
+
+  // ============== IMA state ==============
   var adContainer = null;
   var adDisplayContainer = null;
   var adsLoader = null;
   var adsManager = null;
   var adVideo = null;
   var adDoneCallback = null;
-  var adInitialized = false;
 
-  // ============== IMA SETUP ==============
+  function slotSize() {
+    return {
+      w: window.innerWidth || CONFIG.linearAdSlotWidth,
+      h: window.innerHeight || CONFIG.linearAdSlotHeight
+    };
+  }
+
+  function teardownIma() {
+    if (adsManager) {
+      try { adsManager.destroy(); } catch (e) {}
+      adsManager = null;
+    }
+    if (adDisplayContainer) {
+      try { adDisplayContainer.destroy(); } catch (e) {}
+      adDisplayContainer = null;
+    }
+    adsLoader = null;
+  }
+
   function initIMA() {
     if (typeof google === "undefined" || !google.ima) {
       console.warn("[Ads] IMA SDK not loaded");
@@ -48,9 +121,7 @@
       return false;
     }
 
-    if (adsLoader) {
-      adsLoader.destroy();
-    }
+    teardownIma();
 
     adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, adVideo);
     adsLoader = new google.ima.AdsLoader(adDisplayContainer);
@@ -66,22 +137,28 @@
       false
     );
 
-    adInitialized = true;
     return true;
   }
 
   function requestAd() {
-    if (!adInitialized && !initIMA()) {
+    if (!adsLoader && !initIMA()) {
       adDone();
       return;
     }
 
+    google.ima.settings.setNumRedirects(CONFIG.numRedirects);
+    applyVpaidMode();
+
     var adsRequest = new google.ima.AdsRequest();
     adsRequest.adTagUrl = getAdTagUrl();
-    adsRequest.linearAdSlotWidth = window.innerWidth;
-    adsRequest.linearAdSlotHeight = window.innerHeight;
-    adsRequest.nonLinearAdSlotWidth = window.innerWidth;
-    adsRequest.nonLinearAdSlotHeight = Math.floor(window.innerHeight / 3);
+    adsRequest.linearAdSlotWidth = CONFIG.linearAdSlotWidth;
+    adsRequest.linearAdSlotHeight = CONFIG.linearAdSlotHeight;
+    adsRequest.nonLinearAdSlotWidth = CONFIG.nonLinearAdSlotWidth;
+    adsRequest.nonLinearAdSlotHeight = CONFIG.nonLinearAdSlotHeight;
+    adsRequest.vastLoadTimeout = CONFIG.vastLoadTimeout;
+    adsRequest.adWillAutoPlay = true;
+    adsRequest.adWillPlayMuted = false;
+    adsRequest.continuousPlayback = false;
 
     try {
       adsLoader.requestAds(adsRequest);
@@ -92,21 +169,30 @@
   }
 
   function onAdsManagerLoaded(adsManagerLoadedEvent) {
-    adsManager = adsManagerLoadedEvent.getAdsManager(adVideo);
+    var ars = new google.ima.AdsRenderingSettings();
+    ars.loadVideoTimeout = CONFIG.loadVideoTimeout;
+
+    try {
+      adsManager = adsManagerLoadedEvent.getAdsManager(adVideo, ars);
+    } catch (err) {
+      console.error("[Ads] getAdsManager:", err);
+      adDone();
+      return;
+    }
 
     adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdError);
     adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, onAdComplete);
     adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, onAdComplete);
     adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED, onAdComplete);
 
+    var sz = slotSize();
+
     try {
-      adDisplayContainer.initialize();
+      if (adDisplayContainer && adDisplayContainer.initialize) {
+        adDisplayContainer.initialize();
+      }
       adContainer.style.display = "block";
-      adsManager.init(
-        window.innerWidth,
-        window.innerHeight,
-        google.ima.ViewMode.FULLSCREEN
-      );
+      adsManager.init(sz.w, sz.h, google.ima.ViewMode.FULLSCREEN);
       adsManager.start();
     } catch (err) {
       console.error("[Ads] adsManager start error:", err);
@@ -115,7 +201,9 @@
   }
 
   function onAdError(adErrorEvent) {
-    console.log("[Ads] Ad error:", adErrorEvent.getError());
+    try {
+      console.log("[Ads] Ad error:", adErrorEvent.getError && adErrorEvent.getError());
+    } catch (e) {}
     adDone();
   }
 
@@ -124,16 +212,11 @@
   }
 
   function adDone() {
-    if (adsManager) {
-      try { adsManager.destroy(); } catch (e) {}
-      adsManager = null;
-    }
+    teardownIma();
 
     if (adContainer) {
       adContainer.style.display = "none";
     }
-
-    adInitialized = false;
 
     if (typeof adDoneCallback === "function") {
       var cb = adDoneCallback;
@@ -143,27 +226,26 @@
   }
 
   window.addEventListener("resize", function () {
-    if (adsManager) {
-      try {
-        adsManager.resize(
-          window.innerWidth,
-          window.innerHeight,
-          google.ima.ViewMode.FULLSCREEN
-        );
-      } catch (e) {}
-    }
+    if (!adsManager) return;
+    try {
+      var sz = slotSize();
+      adsManager.resize(sz.w, sz.h, google.ima.ViewMode.FULLSCREEN);
+    } catch (e) {}
   });
 
-  // ============== PUBLIC API ==============
+  // ============== Public API ==============
   window.AdsManager = {
     showPreroll: function (callback) {
       adDoneCallback = callback || function () {};
-      initIMA();
+      if (!initIMA()) {
+        adDone();
+        return;
+      }
       requestAd();
     }
   };
 
-  // ============== UNITY GAME BRIDGE ==============
+  // ============== Unity bridge ==============
   window.showNextAd = function () {
     console.log("[Ads] showNextAd");
     passBeforeAdData();
