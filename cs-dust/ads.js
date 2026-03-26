@@ -202,8 +202,17 @@
 
   function onAdError(adErrorEvent) {
     try {
-      console.log("[Ads] Ad error:", adErrorEvent.getError && adErrorEvent.getError());
-    } catch (e) {}
+      var er = adErrorEvent.getError && adErrorEvent.getError();
+      var code = er && er.getErrorCode ? er.getErrorCode() : null;
+      var msg = er && er.getMessage ? er.getMessage() : String(er || adErrorEvent);
+      if (code != null) {
+        console.warn("[Ads] AdError " + code + ":", msg);
+      } else {
+        console.warn("[Ads] Ad error:", msg);
+      }
+    } catch (e) {
+      console.warn("[Ads] Ad error (raw):", adErrorEvent);
+    }
     adDone();
   }
 
