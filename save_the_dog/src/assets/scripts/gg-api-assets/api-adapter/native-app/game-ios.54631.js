@@ -1,0 +1,1 @@
+console.log("[TS-API] ===>>>","Load API iOS.",gg.isIOS),window.gg=window.gg||{},gg.isIOS;

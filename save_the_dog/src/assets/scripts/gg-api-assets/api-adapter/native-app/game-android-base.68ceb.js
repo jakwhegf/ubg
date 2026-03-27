@@ -1,0 +1,1 @@
+console.log("[TS-API] ===>>>","Load API Android.",gg.isAndroid),window.gg=window.gg||{},gg.isAndroid&&(gg.connectDatabase=g=>{gg.log("\u8c03\u7528Android\u7684connectDatabase\u6570\u636e\u5e93",gg.stringifyJSON(g));let a=Database.db[g.filePath];return a||(a=new Database(g.filePath,g.password)),a});

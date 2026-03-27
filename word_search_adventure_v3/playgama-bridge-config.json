@@ -1,0 +1,46 @@
+{
+    "platforms": {
+        "game_distribution": {
+            "gameId": ""
+        },
+        "telegram": {
+            "adsgramBlockId": ""
+        },
+        "y8": {
+            "gameId": "692546e4ab163b41b9a8c1d3",
+            "adsenseId": "ca-pub-2861343636416493",
+            "channelId": ""
+        },
+        "lagged": {
+            "devId": "",
+            "publisherId": ""
+        },
+        "msn": {
+            "gameId": ""
+        },
+        "discord" : {
+            "appId": ""
+        },
+        "gamepush": {
+            "projectId": "",
+            "publicToken": ""
+        }
+    },
+    "advertisement": {
+        "interstitial": {
+            "preloadOnStart": true
+        },
+        "rewarded": {
+            "preloadOnStart": true
+        },
+        "useAdvertisementErrorPopup": false,
+        "useBuiltInErrorPopup": false,
+        "backfillId": ""
+    },
+    "payments": [],
+    "leaderboards": [
+        {
+            "id": ""
+        }
+    ]
+}

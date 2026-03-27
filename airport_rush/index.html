@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Airport Rush</title>
+        
+        <meta name="Title" content="Airport Rush" />
+        <meta name="description" content="Airport Rush is a HTML5 game where you control to clears aircraft for landing and takeoff, ensuring that prescribed runway separation will exist at all time.">
+		<meta name="keywords" content="airport, rush, control, manage, aircraft, landing, takeoff, terminal, runway, planes, game">
+        
+        <!-- for Facebook -->
+        <meta property="og:title" content="Airport Rush"/>
+        <meta property="og:site_name" content="Airport Rush"/>
+        <meta property="og:image" content="http://demonisblack.com/code/airportrush/game/share.jpg" />
+        <meta property="og:url" content="http://demonisblack.com/code/airportrush/game/" />
+        <meta property="og:description" content="Airport Rush is a HTML5 game where you control to clears aircraft for landing and takeoff, ensuring that prescribed runway separation will exist at all time.">
+        
+        <!-- for Twitter -->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Airport Rush" />
+        <meta name="twitter:description" content="Airport Rush is a HTML5 game where you control to clears aircraft for landing and takeoff, ensuring that prescribed runway separation will exist at all time." />
+        <meta name="twitter:image" content="http://demonisblack.com/code/airportrush/game/share.jpg" />
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<script>
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement("style");
+            msViewportStyle.appendChild(
+                document.createTextNode(
+                    "@-ms-viewport{width:device-width}"
+                )
+            );
+            document.getElementsByTagName("head")[0].
+                appendChild(msViewportStyle);
+        }
+        </script>
+
+        <link rel="shortcut icon" href="icon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+    	<!-- CONTENT START-->
+        <div id="mainHolder">
+        	<!-- BROWSER NOT SUPPORT START-->
+        	<div id="notSupportHolder">
+                <div class="notSupport">YOUR BROWSER ISN'T SUPPORTED.<br/>PLEASE UPDATE YOUR BROWSER IN ORDER TO RUN THE GAME</div>
+            </div>
+            <!-- BROWSER NOT SUPPORT END-->
+            
+            <!-- ROTATE INSTRUCTION START-->
+            <div id="rotateHolder">
+                <div class="mobileRotate">
+                        <div class="rotateDesc">Rotate your device <br/>to landscape</div>
+                </div>
+            </div>
+            <!-- ROTATE INSTRUCTION END-->
+            
+            <!-- CANVAS START-->
+            <div id="canvasHolder">
+                <canvas id="gameCanvas" width="1024" height="768"></canvas>
+            </div>
+            <!-- CANVAS END-->
+            
+            <!-- PROGRESS BAR LOADER START-->
+            <div id="loaderHolder">
+            	<div class="percentHolder">
+                	<div class="percentIndicator"></div>
+                </div>
+            	
+            </div>
+            <!-- PROGRESS BAR LOADER END-->
+        </div>
+        <!-- CONTENT END-->
+        
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.4.min.js"><\/script><script src="js/vendor/jquery-ui-1.11.4.min.js"><\/script>')</script>
+        
+        <script src="js/vendor/detectmobilebrowser.js"></script>
+        <script src="js/vendor/createjs-2015.11.26.min.js"></script>
+        <script src="js/vendor/TweenMax.min.js"></script>
+        
+        <script src="js/plugins.js"></script>
+        <script src="js/sound.js"></script>
+        <script src="js/canvas.js"></script>
+        <script src="js/terminals.js"></script>
+        <script src="js/game.js"></script>
+		<script src="js/mobile.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/loader.js"></script>
+        <script src="js/init.js"></script>
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		  ga('create', 'UA-424386-42', 'auto');
+		  ga('send', 'pageview');
+                  
+                   /*************************Idnet *************************/
+                    window.idAsyncInit = function() {
+                    // use an id.net event to wait until after init
+                    ID.Event.subscribe('id.init', function(){
+                        // use jquery to call methods on clicks
+                        console.log('from')
+                         ID.getLoginStatus(idCallback)
+                         ID.Protection.isBlacklisted(function(blacklisted){
+                            //blacklisted = true
+                            //oMain.blackListState(blacklisted);
+                            s_isBlacklisted = blacklisted;
+                            console.log('[BLACKLIST] : ' + blacklisted);
+                        });
+                         ID.Protection.isSponsor(function(sponsor){
+                           // sponsor = true
+                            //oMain.sponsorStatus(sponsor);
+                            s_sponsor = sponsor;
+                            console.log('[SPONSOR] : ' + sponsor);
+                            if(s_y8Logo !== null && s_y8Logo !== undefined )
+                            {
+                                if(s_sponsor === false)
+                                {
+                                   s_y8Logo.cursor = "pointer"; 
+                                }
+                                else
+                                {
+                                    s_y8Logo.cursor = "initial";
+                                }
+                            }
+                        });
+                        
+                        //oMain.LoadData()
+                    });
+                    // using an optional callback to capture data on the client
+                    var userName;
+                    var idCallback = function(response){
+                        if (response) { // That means that the server processed the response
+                            console.log(response);
+                            console.log(response.status);
+                             console.log('Working');
+                             console.log('response.status ' + response.status);
+                            if(response.status === 'ok')
+                            {
+                               userName = response.authResponse.details.nickname;
+                               //oMain.getUserName(userName,true);
+                               s_userName = userName;
+                               s_isLogin = true;
+                               if(welcomeText !== null && welcomeText !== undefined )
+                               {
+                                   welcomeText.text = "Welcome " + s_userName;
+                               }
+                            }
+                            else if(response.status === 'not_linked')
+                            {
+                                ID.login(idCallback);
+                            }
+                        }
+                    }
+                    // init the JS interface
+                    ID.init({
+                        appId : '5ae2f68ce694aa885ad3f5d3'
+                    });
+                };
+
+                // load the idnet js interface
+                (function(d, s, id){
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) {return;}
+                    js = d.createElement(s); js.id = id;
+                    js.src =  document.location.protocol == 'https:' ? "https://scdn.id.net/api/sdk.js" : "http://cdn.id.net/api/sdk.js";
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'id-jssdk'));
+                /**************************************************************/
+		
+		</script>
+    </body>
+</html>

@@ -1,0 +1,11 @@
+{
+"TOTAL_MEMORY": 268435456,
+"dataUrl": "nextgen_tennis_v4.data.unityweb",
+"wasmCodeUrl": "nextgen_tennis_v4.wasm.code.unityweb",
+"wasmFrameworkUrl": "nextgen_tennis_v4.wasm.framework.unityweb",
+"asmCodeUrl": "nextgen_tennis_v4.asm.code.unityweb",
+"asmMemoryUrl": "nextgen_tennis_v4.asm.memory.unityweb",
+"asmFrameworkUrl": "nextgen_tennis_v4.asm.framework.unityweb",
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20"
+}

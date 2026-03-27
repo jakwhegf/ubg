@@ -1,0 +1,12 @@
+{
+"companyName": "Y8",
+"productName": "Rocking Sky Trip",
+"dataUrl": "rocking_sky_trip_25_sept.data.unityweb",
+"wasmCodeUrl": "rocking_sky_trip_25_sept.wasm.code.unityweb",
+"wasmFrameworkUrl": "rocking_sky_trip_25_sept.wasm.framework.unityweb",
+"TOTAL_MEMORY": 134217728,
+"graphicsAPI": ["WebGL 2.0", "WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20"
+}

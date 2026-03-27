@@ -1,0 +1,2 @@
+FIX OOM: Dùng trình duyệt 64-bit + chạy play.bat (HTTP server)
+Chi tiết: xem OOM_FIX.txt ở thư mục gốc project
