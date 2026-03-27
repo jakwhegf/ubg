@@ -1,2 +1,0 @@
-// Gắn URL ad tag từ sdk-ima/tag manager.txt vào biến toàn cục
-window.vastAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?iu=/23136362493/ads-video-main&description_url=http%3A%2F%2Fcool2fun.guthub.io&tfcd=0&npa=0&sz=640x480&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=";
